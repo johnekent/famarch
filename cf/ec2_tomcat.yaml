@@ -9,7 +9,7 @@ Parameters:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance.
     Type: 'AWS::EC2::KeyPair::KeyName'
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
-    Default: brainflutter-zone6-pem
+    Default: famarch
   SSHLocation:
     Description: 'The IP address range that can be used access the web server using SSH.'
     Type: String
@@ -76,8 +76,8 @@ Resources:
       'AWS::CloudFormation::Init':
         configSets:
           All:
-            - ConfigureSampleApp
-        ConfigureSampleApp:
+            - ConfigureServices
+        ConfigureServices:
           packages:
             yum:
               httpd: []
@@ -87,7 +87,7 @@ Resources:
                 - |+
 
                 - - >-
-                    <h1>Welcome to the Placeholder of</h1>
+                    <h2>Welcome to the Placeholder of...</h2>
                     <h1>The Archives</h1>
               mode: '000644'
               owner: root
@@ -108,6 +108,12 @@ Resources:
           DeviceIndex: '0'
           DeleteOnTermination: 'true'
           SubnetId: !Ref PublicSubnet
+      BlockDeviceMappings:
+          - DeviceName: /dev/sdc
+            VirtualName: ephemeral0
+          - DeviceName: /dev/sda1
+            Ebs:
+              VolumeSize: 10            
       UserData: !Base64 
         'Fn::Join':
           - ''

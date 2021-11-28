@@ -4,7 +4,7 @@ Parameters:
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
-    Default: t2.micro
+    Default: t4g.micro
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance.
     Type: 'AWS::EC2::KeyPair::KeyName'
@@ -87,8 +87,8 @@ Resources:
                 - |+
 
                 - - >-
-                    <h1>Congratulations, you have successfully launched the AWS
-                    CloudFormation sample.</h1>
+                    <h1>Welcome to the Placeholder of</h1>
+                    <h1>The Archives</h1>
               mode: '000644'
               owner: root
               group: root

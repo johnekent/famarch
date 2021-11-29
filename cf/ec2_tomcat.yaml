@@ -78,9 +78,6 @@ Resources:
           All:
             - ConfigureServices
         ConfigureServices:
-          packages:
-            yum:
-              httpd: []
           files:
             /var/www/html/index.html:
               content: !Join 
@@ -92,11 +89,6 @@ Resources:
               mode: '000644'
               owner: root
               group: root
-          services:
-            sysvinit:
-              httpd:
-                enabled: 'true'
-                ensureRunning: 'true'
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !Ref ImageId 

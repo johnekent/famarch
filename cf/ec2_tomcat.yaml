@@ -67,9 +67,45 @@ Resources:
           ToPort: '80'
           CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
           FromPort: '22'
           ToPort: '22'
           CidrIp: !Ref SSHLocation
+  WebServerInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      Roles:
+        - !Ref S3AccessRole
+  S3AccessPolicy:
+    Type: 'AWS::IAM::Policy'
+    Properties:
+      PolicyName: S3AccessPolicy
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 's3:List*'
+              - 's3:Get*'
+            Resource: '*'
+      Roles:
+        - !Ref S3AccessRole
+  S3AccessRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
   WebServerInstance:
     Type: 'AWS::EC2::Instance'
     Metadata:
@@ -78,29 +114,21 @@ Resources:
           All:
             - ConfigureServices
         ConfigureServices:
-          packages:
-            yum:
-              httpd: []
           files:
             /var/www/html/index.html:
               content: !Join 
                 - |+
-
                 - - >-
                     <h2>Welcome to the Placeholder of...</h2>
                     <h1>The Archives</h1>
               mode: '000644'
               owner: root
               group: root
-          services:
-            sysvinit:
-              httpd:
-                enabled: 'true'
-                ensureRunning: 'true'
     Properties:
       InstanceType: !Ref InstanceType
       ImageId: !Ref ImageId 
       KeyName: !Ref KeyName
+      IamInstanceProfile: !Ref WebServerInstanceProfile
       NetworkInterfaces:
         - GroupSet:
             - !Ref WebServerSecurityGroup
@@ -113,7 +141,7 @@ Resources:
             VirtualName: ephemeral0
           - DeviceName: /dev/sda1
             Ebs:
-              VolumeSize: 10            
+              VolumeSize: 20            
       UserData: !Base64 
         'Fn::Join':
           - ''
@@ -121,6 +149,8 @@ Resources:
               #!/bin/bash -xe
             - |
               yum update -y aws-cfn-bootstrap
+            - |
+              amazon-linux-extras install java-openjdk11
             - |
               # Install the files and packages from the metadata
             - '/opt/aws/bin/cfn-init -v '

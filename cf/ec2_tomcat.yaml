@@ -139,7 +139,7 @@ Resources:
       BlockDeviceMappings:
           - DeviceName: /dev/sdc
             VirtualName: ephemeral0
-          - DeviceName: /dev/sda1
+          - DeviceName: /dev/sda2
             Ebs:
               VolumeSize: 20            
       UserData: !Base64 
@@ -150,7 +150,9 @@ Resources:
             - |
               yum update -y aws-cfn-bootstrap
             - |
-              amazon-linux-extras install java-openjdk11
+              mkfs -t xfs /dev/nvme1n1; mkdir /xtf; mount /dev/nvme1n1 /xtf
+            - |
+              aws s3 cp s3://us-east-1-brainflutter-xtf-fam/xtf/xtf.tar.gz /xtf/xtf.tar.gz
             - |
               # Install the files and packages from the metadata
             - '/opt/aws/bin/cfn-init -v '

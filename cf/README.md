@@ -50,7 +50,11 @@ nvme1n1       259:1    0  20G  0 disk /xtf
 [root@ip-10-31-1-181 xtf]# aws s3 cp s3://us-east-1-brainflutter-xtf-fam/xtf/xtf.tar.gz xtf.tar.gz
 
 ## Then extract
-tar -xvf xtf.tar.gz
+tar -xzvf xtf.tar.gz
+## AND recursively unzip any of the internal files
+gunzip -r /xtf/xtf
+## HOWEVER, don't run that on the index... or just re-gzip the txt files here
+gzip /xtf/xtf/index/pluralMap.txt
 
 ## and create a link to that directory from webapps in tomcat
 ln -s /xtf/xtf $CATALINA_HOME/webapps/xtf

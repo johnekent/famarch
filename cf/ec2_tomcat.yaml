@@ -28,11 +28,22 @@ Resources:
       EnableDnsSupport: 'true'
       EnableDnsHostnames: 'true'
       CidrBlock: 10.31.0.0/16
-  PublicSubnet:
+      Tags:
+        Name: 'XtfFamVpc'
+  PublicSubnet1:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: 10.31.1.0/24
       VpcId: !Ref VPC
+      Tags:
+        Name:  'XtfFamPublicSubnet1'
+  PublicSubnet2:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: 10.31.2.0/24
+      VpcId: !Ref VPC
+      Tags:
+        Name:  'XtfFamPublicSubnet2'
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
   VPCGatewayAttachment:
@@ -51,10 +62,15 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
-  PublicSubnetRouteTableAssociation:
+  PublicSubnet1RouteTableAssociation:
     Type: 'AWS::EC2::SubnetRouteTableAssociation'
     Properties:
-      SubnetId: !Ref PublicSubnet
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+  PublicSubnet2RouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet2
       RouteTableId: !Ref PublicRouteTable
   WebServerSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -115,12 +131,13 @@ Resources:
             - ConfigureServices
         ConfigureServices:
           files:
-            /var/www/html/index.html:
+            /xtf/xtf/index.html:
               content: !Join 
                 - |+
                 - - >-
                     <h2>Welcome to the Placeholder of...</h2>
                     <h1>The Archives</h1>
+                    <a href='http://addy:8080/xtf/search'>Search</a>
               mode: '000644'
               owner: root
               group: root
@@ -135,7 +152,7 @@ Resources:
           AssociatePublicIpAddress: 'true'
           DeviceIndex: '0'
           DeleteOnTermination: 'true'
-          SubnetId: !Ref PublicSubnet
+          SubnetId: !Ref PublicSubnet1
       BlockDeviceMappings:
           - DeviceName: /dev/sdc
             VirtualName: ephemeral0
@@ -176,7 +193,7 @@ Resources:
 
     CreationPolicy:
       ResourceSignal:
-        Timeout: PT5M
+        Timeout: PT15M
 Outputs:
   URL:
     Value: !Join 

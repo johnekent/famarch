@@ -29,21 +29,24 @@ Resources:
       EnableDnsHostnames: 'true'
       CidrBlock: 10.31.0.0/16
       Tags:
-        - Name: 'XtfFamVpc'
+        - Key: 'Name'
+          Value: 'XtfFamVpc'
   PublicSubnet1:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: 10.31.1.0/24
       VpcId: !Ref VPC
       Tags:
-        - Name:  'XtfFamPublicSubnet1'
+        - Key: 'Name'
+          Value:  'XtfFamPublicSubnet1'
   PublicSubnet2:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: 10.31.2.0/24
       VpcId: !Ref VPC
       Tags:
-        - Name:  'XtfFamPublicSubnet2'
+        - Key: 'Name'
+          Value: 'XtfFamPublicSubnet2'
   InternetGateway:
     Type: 'AWS::EC2::InternetGateway'
   VPCGatewayAttachment:

@@ -35,6 +35,7 @@ Resources:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: 10.31.1.0/24
+      AvailabilityZone: 'us-east-1c'
       VpcId: !Ref VPC
       Tags:
         - Key: 'Name'
@@ -43,6 +44,7 @@ Resources:
     Type: 'AWS::EC2::Subnet'
     Properties:
       CidrBlock: 10.31.2.0/24
+      AvailabilityZone: 'us-east-1d'
       VpcId: !Ref VPC
       Tags:
         - Key: 'Name'

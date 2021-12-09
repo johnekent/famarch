@@ -185,6 +185,8 @@ Resources:
             - |
               aws s3 cp s3://us-east-1-brainflutter-xtf-fam/xtf/xtf.tar.gz /xtf/xtf.tar.gz
             - |
+              cd /xtf; tar -xzvf xtf.tar.gz 
+            - |
               # Install the files and packages from the metadata
             - '/opt/aws/bin/cfn-init -v '
             - '         --stack '

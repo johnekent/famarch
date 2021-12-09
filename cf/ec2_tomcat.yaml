@@ -187,6 +187,12 @@ Resources:
             - |
               cd /xtf; tar -xzvf xtf.tar.gz 
             - |
+              gunzip -r /xtf/xtf
+            - |
+              gzip /xtf/xtf/index/pluralMap.txt
+            - |
+              ln -s /xtf/xtf $CATALINA_HOME/webapps/xtf
+            - |
               # Install the files and packages from the metadata
             - '/opt/aws/bin/cfn-init -v '
             - '         --stack '

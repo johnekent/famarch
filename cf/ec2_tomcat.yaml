@@ -247,9 +247,10 @@ Resources:
       - !Ref PublicSubnet2
       SecurityGroups:
         - !GetAtt ALBSecurityGroup.GroupId
-  CreationPolicy:
-    ResourceSignal:
-      Timeout: PT15M
+
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT15M
 
 Outputs:
   URL:

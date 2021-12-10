@@ -151,9 +151,9 @@ Resources:
               content: !Join 
                 - |+
                 - - >-
-                    <h2>Welcome to the Placeholder of...</h2>
+                    <h2>Welcome to...</h2></br>
                     <h1>The Archives</h1>
-                    <a href='http://addy:8080/xtf/search'>Search</a>
+                    <a href='./search'>Search</a>
               mode: '000644'
               owner: root
               group: root
@@ -187,6 +187,7 @@ Resources:
             gzip /xtf/xtf/index/pluralMap.txt
             # $CATALINA_HOME is not defined at this point or for this user
             #ln -s /xtf/xtf $CATALINA_HOME/webapps/xtf
+            ln -s /xtf/xtf /bin/apache-tomcat-9.0.55/webapps/xtf
             # Install the files and packages from the metadata
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerInstance --configsets All --region ${AWS::Region}
             # Signal the status from cfn-init

@@ -175,45 +175,26 @@ Resources:
           - DeviceName: /dev/sda2
             Ebs:
               VolumeSize: 20            
-      UserData: !Base64 
-        'Fn::Join':
-          - ''
-          - - |
-              #!/bin/bash -xe
-            - |
-              yum update -y aws-cfn-bootstrap
-            - |
-              mkfs -t xfs /dev/nvme1n1; mkdir /xtf; mount /dev/nvme1n1 /xtf
-            - |
-              aws s3 cp s3://us-east-1-brainflutter-xtf-fam/xtf/xtf.tar.gz /xtf/xtf.tar.gz
-            - |
-              cd /xtf; tar -xzvf xtf.tar.gz 
-            - |
-              gunzip -r /xtf/xtf
-            - |
-              gzip /xtf/xtf/index/pluralMap.txt
-            - |
-              ln -s /xtf/xtf $CATALINA_HOME/webapps/xtf
-            - |
-              # Install the files and packages from the metadata
-            - '/opt/aws/bin/cfn-init -v '
-            - '         --stack '
-            - !Ref 'AWS::StackName'
-            - '         --resource WebServerInstance '
-            - '         --configsets All '
-            - '         --region '
-            - !Ref 'AWS::Region'
-            - |+
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            yum update -y aws-cfn-bootstrap
+            mkfs -t xfs /dev/nvme1n1; mkdir /xtf; mount /dev/nvme1n1 /xtf
+            aws s3 cp s3://us-east-1-brainflutter-xtf-fam/xtf/xtf.tar.gz /xtf/xtf.tar.gz
+            cd /xtf; tar -xzvf xtf.tar.gz 
+            gunzip -r /xtf/xtf
+            gzip /xtf/xtf/index/pluralMap.txt
+            # $CATALINA_HOME is not defined at this point or for this user
+            #ln -s /xtf/xtf $CATALINA_HOME/webapps/xtf
+            # Install the files and packages from the metadata
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerInstance --configsets All --region ${AWS::Region}
+            # Signal the status from cfn-init
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerInstance --region ${AWS::Region}
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT20M
 
-            - |
-              # Signal the status from cfn-init
-            - '/opt/aws/bin/cfn-signal -e $? '
-            - '         --stack '
-            - !Ref 'AWS::StackName'
-            - '         --resource WebServerInstance '
-            - '         --region '
-            - !Ref 'AWS::Region'
-            - |+
 
   EC2TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -253,10 +234,6 @@ Resources:
       - !Ref PublicSubnet2
       SecurityGroups:
         - !GetAtt ALBSecurityGroup.GroupId
-
-    CreationPolicy:
-      ResourceSignal:
-        Timeout: PT15M
 
 Outputs:
   URL:

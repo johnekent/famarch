@@ -236,6 +236,18 @@ Resources:
       SecurityGroups:
         - !GetAtt ALBSecurityGroup.GroupId
 
+  Route53DNS:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneName: ancestral.pictures.
+      Comment: Zone apex alias targeted to ApplicationLoadBalancer.
+      RecordSets:
+      - Name: ancestral.pictures.
+        Type: A
+        AliasTarget:
+          HostedZoneId: !GetAtt 'ApplicationLoadBalancer.CanonicalHostedZoneID'
+          DNSName: !GetAtt 'ApplicationLoadBalancer.DNSName'
+
 Outputs:
   URL:
     Value: !Join 

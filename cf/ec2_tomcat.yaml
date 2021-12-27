@@ -86,8 +86,8 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
+        FromPort: 80
+        ToPort: 80
         CidrIp: 0.0.0.0/0
   WebServerSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -224,7 +224,7 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref EC2TargetGroup
       LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 8080
+      Port: 80
       Protocol: HTTP
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer

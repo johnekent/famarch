@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: XTF Tomcat Setup.
 Parameters:
+  ALBListenerHttpsCertArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:653434772132:certificate/c12d364f-edf5-4e9e-9880-8d2d9330efa1
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
@@ -86,8 +89,12 @@ Resources:
       VpcId: !Ref VPC
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
         CidrIp: 0.0.0.0/0
   WebServerSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -152,7 +159,7 @@ Resources:
                 - |+
                 - - >-
                     <h2>Welcome to...</h2></br>
-                    <h1>The Archives</h1>
+                    <h1 style="color:#2813ad;">The Ancestral Pictures Archives</h1>
                     <a href='./search'>Search</a>
               mode: '000644'
               owner: root
@@ -228,8 +235,19 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref EC2TargetGroup
       LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 8080
+      Port: 80
       Protocol: HTTP
+  ALBListenerHttps:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref ALBListenerHttpsCertArn
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref EC2TargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -239,7 +257,6 @@ Resources:
       - !Ref PublicSubnet2
       SecurityGroups:
         - !GetAtt ALBSecurityGroup.GroupId
-
   Route53DNS:
     Type: AWS::Route53::RecordSetGroup
     Properties:

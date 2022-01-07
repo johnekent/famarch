@@ -195,10 +195,11 @@ Resources:
             # $CATALINA_HOME is not defined at this point or for this user
             #ln -s /xtf/xtf $CATALINA_HOME/webapps/xtf
             ln -s /xtf/xtf /bin/apache-tomcat-9.0.55/webapps/xtf
-            # get xmlstarlet and add Valve to server.xml for TLS offloading at ALB to work
+            # get xmlstarlet and add Valve to server.xml for TLS offloading at ALB to work; bounce after updating
             yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
             yum install -y xmlstarlet
             xmlstarlet ed -P --inplace -s Server/Service/Engine/Host -t elem -n Valve -i '$prev' -t attr -n className -v org.apache.catalina.valves.RemoteIpValve /bin/apache-tomcat-9.0.55/conf/server.xml
+            systemctl restart RunTomcatonStartup.service
             # Install the files and packages from the metadata
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource WebServerInstance --configsets All --region ${AWS::Region}
             # Signal the status from cfn-init

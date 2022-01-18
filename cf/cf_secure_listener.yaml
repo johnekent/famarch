@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: XTF Tomcat Secure ALB Listener - separate one used for testing - not really expected to be run.
+Parameters:
+  ALBListenerHttpsCertArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:653434772132:certificate/af92d69b-1f9c-42c3-8bd8-f8dde32b3104
+Resources:
+  ALBListenerHttps:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref ALBListenerHttpsCertArn
+      DefaultActions:
+        - Type: authenticate-cognito
+          Order: 1
+          AuthenticateCognitoConfig:
+            OnUnauthenticatedRequest: authenticate
+            Scope: openid
+            SessionCookieName: AWSELBAuthSessionCookie  # default
+            SessionTimeout: 43200  # 12 hours
+            UserPoolArn: arn:aws:cognito-idp:us-east-1:653434772132:userpool/us-east-1_qitWt2Z12
+            UserPoolClientId: 5q9fif2c6i82529p06og7gl18e
+            UserPoolDomain: ancestral-pictures
+        - Type: forward
+          Order: 2
+          TargetGroupArn: arn:aws:elasticloadbalancing:us-east-1:653434772132:targetgroup/EC2TargetGroup/20a5c502fa7598e9
+      LoadBalancerArn: arn:aws:elasticloadbalancing:us-east-1:653434772132:loadbalancer/app/xtf-f-Appli-1KF4OTB4D4PXM/1f6196bc7171dc0b
+      Port: 4444
+      Protocol: HTTPS
+      SslPolicy:  ELBSecurityPolicy-2016-08  # default

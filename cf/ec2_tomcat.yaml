@@ -3,7 +3,7 @@ Description: XTF Tomcat Setup.
 Parameters:
   ALBListenerHttpsCertArn:
     Type: String
-    Default: arn:aws:acm:us-east-1:653434772132:certificate/c12d364f-edf5-4e9e-9880-8d2d9330efa1
+    Default: arn:aws:acm:us-east-1:653434772132:certificate/af92d69b-1f9c-42c3-8bd8-f8dde32b3104
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
@@ -229,26 +229,7 @@ Resources:
         Port: 8080
       UnhealthyThresholdCount: 3
       VpcId: !Ref VPC
-  ALBListener:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref EC2TargetGroup
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 80
-      Protocol: HTTP
-  ALBListenerHttps:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      Certificates:
-        - CertificateArn: !Ref ALBListenerHttpsCertArn
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref EC2TargetGroup
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 443
-      Protocol: HTTPS
+
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -258,6 +239,31 @@ Resources:
       - !Ref PublicSubnet2
       SecurityGroups:
         - !GetAtt ALBSecurityGroup.GroupId
+
+  ALBListenerHttps:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref ALBListenerHttpsCertArn
+      DefaultActions:
+        - Type: authenticate-cognito
+          Order: 1
+          AuthenticateCognitoConfig:
+            OnUnauthenticatedRequest: authenticate
+            Scope: openid
+            SessionCookieName: AWSELBAuthSessionCookie  # default
+            SessionTimeout: 43200  # 12 hours
+            UserPoolArn: arn:aws:cognito-idp:us-east-1:653434772132:userpool/us-east-1_qitWt2Z12  #Note: all of this pool manually created
+            UserPoolClientId: 5q9fif2c6i82529p06og7gl18e
+            UserPoolDomain: ancestral-pictures
+        - Type: forward
+          Order: 2
+          TargetGroupArn: !Ref EC2TargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy:  ELBSecurityPolicy-2016-08  # default
+
   Route53DNS:
     Type: AWS::Route53::RecordSetGroup
     Properties:

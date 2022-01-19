@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: XTF Tomcat Cognito setup - separate one used for testing - not really expected to be run.
+Parameters:
+  CognitoBaseName:
+      Type: String
+      Default: ancestral-pictures
+  CognitoSuffix:
+      Description:  Must be lower case.  Something to make it unique, used exclusively for testing.
+      Type: String
+      Default: cf
+  LWAClientId:
+      Type: String
+      Default: amzn1.application-oa2-client.b2d624fcfa1e47a69ebcd08b04e159c4
+  LWAClientSecret:
+    Type: String
+    Default: 457a789515783e8e4429b2f008ba5c084ad56c4c6c07660b494571d4ed6eedf9
+Resources:
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      #AliasAttributes: - given_name - family_name - email   #TODO determine where to put these
+      EmailConfiguration:
+        EmailSendingAccount: COGNITO_DEFAULT
+      MfaConfiguration: 'OFF'
+      UserPoolName: !Sub '${CognitoBaseName}.pool${CognitoSuffix}'
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !Sub '${CognitoBaseName}${CognitoSuffix}'
+      UserPoolId: !Ref CognitoUserPool
+  CognitoUserPoolIdentityProvider:
+    Type: 'AWS::Cognito::UserPoolIdentityProvider'
+    Properties:
+      AttributeMapping:
+        email: email
+        family_name: name
+        given_name: name
+        username: user_id
+      ProviderDetails:
+        client_id: !Ref LWAClientId
+        client_secret: !Ref LWAClientSecret
+        authorize_scopes: 'profile:email profile:name'
+      ProviderName: LoginWithAmazon
+      ProviderType: LoginWithAmazon
+      UserPoolId: !Ref CognitoUserPool
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    DependsOn: CognitoUserPoolIdentityProvider
+    Properties: 
+      AccessTokenValidity: 1
+      AllowedOAuthFlows: 
+        - client_credentials
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: 
+        - openid
+      CallbackURLs: 
+        - !Sub 'https://${CognitoBaseName}/oauth2/idpresponse'
+      ClientName: !Sub '${CognitoBaseName}.client${CognitoSuffix}'
+      ExplicitAuthFlows: 
+        - ALLOW_REFRESH_TOKEN_AUTH
+      IdTokenValidity: 1
+      PreventUserExistenceErrors: ENABLED  # necessary for Oauth?
+      ReadAttributes:
+        - address
+        - birthdate
+        - email
+        - email_verified
+        - family_name
+        - gender
+        - given_name
+        - locale
+        - middle_name
+        - name
+        - nickname
+        - phone_number
+        - phone_number_verified
+        - picture
+        - preferred_username
+        - profile
+        - updated_at
+        - website
+        - zoneinfo
+      RefreshTokenValidity: 24
+      SupportedIdentityProviders: 
+        - LoginWithAmazon
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: hours
+      UserPoolId: !Ref CognitoUserPool
+      WriteAttributes: 
+        - address
+        - birthdate
+        - email
+        - family_name
+        - gender
+        - given_name
+        - locale
+        - middle_name
+        - name
+        - nickname
+        - phone_number
+        - picture
+        - preferred_username
+        - profile
+        - updated_at
+        - website
+        - zoneinfo

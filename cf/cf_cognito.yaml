@@ -1,10 +1,13 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: XTF Tomcat Cognito setup - separate one used for testing - not really expected to be run.
 Parameters:
+  AppDomainBaseName:
+      Type: String
+      Default: ancestral.pictures
   CognitoBaseName:
       Type: String
       Default: ancestral-pictures
-  CognitoSuffix:
+  CognitoTestSuffix:
       Description:  Must be lower case.  Something to make it unique, used exclusively for testing.
       Type: String
       Default: cf
@@ -22,11 +25,11 @@ Resources:
       EmailConfiguration:
         EmailSendingAccount: COGNITO_DEFAULT
       MfaConfiguration: 'OFF'
-      UserPoolName: !Sub '${CognitoBaseName}.pool${CognitoSuffix}'
+      UserPoolName: !Sub '${CognitoBaseName}.pool${CognitoTestSuffix}'
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties: 
-      Domain: !Sub '${CognitoBaseName}${CognitoSuffix}'
+      Domain: !Sub '${CognitoBaseName}${CognitoTestSuffix}'
       UserPoolId: !Ref CognitoUserPool
   CognitoUserPoolIdentityProvider:
     Type: 'AWS::Cognito::UserPoolIdentityProvider'
@@ -48,14 +51,14 @@ Resources:
     DependsOn: CognitoUserPoolIdentityProvider
     Properties: 
       AccessTokenValidity: 1
-      AllowedOAuthFlows: 
-        - client_credentials
+      AllowedOAuthFlows:
+        - code  # Flows and Scopes required if Flows is true -- code?
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthScopes: 
         - openid
       CallbackURLs: 
-        - !Sub 'https://${CognitoBaseName}/oauth2/idpresponse'
-      ClientName: !Sub '${CognitoBaseName}.client${CognitoSuffix}'
+        - !Sub 'https://${AppDomainBaseName}/oauth2/idpresponse'
+      ClientName: !Sub '${CognitoBaseName}.client'
       ExplicitAuthFlows: 
         - ALLOW_REFRESH_TOKEN_AUTH
       IdTokenValidity: 1

@@ -7,10 +7,6 @@ Parameters:
   CognitoBaseName:
       Type: String
       Default: ancestral-pictures
-  CognitoTestSuffix:
-      Description:  Must be lower case.  Something to make it unique, used exclusively for testing.
-      Type: String
-      Default: cf
   LWAClientId:
       Type: String
       Default: amzn1.application-oa2-client.b2d624fcfa1e47a69ebcd08b04e159c4
@@ -25,11 +21,11 @@ Resources:
       EmailConfiguration:
         EmailSendingAccount: COGNITO_DEFAULT
       MfaConfiguration: 'OFF'
-      UserPoolName: !Sub '${CognitoBaseName}.pool${CognitoTestSuffix}'
+      UserPoolName: !Sub '${CognitoBaseName}.pool'
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
     Properties: 
-      Domain: !Sub '${CognitoBaseName}${CognitoTestSuffix}'
+      Domain: !Sub '${CognitoBaseName}'
       UserPoolId: !Ref CognitoUserPool
   CognitoUserPoolIdentityProvider:
     Type: 'AWS::Cognito::UserPoolIdentityProvider'
@@ -52,7 +48,7 @@ Resources:
     Properties: 
       AccessTokenValidity: 1
       AllowedOAuthFlows:
-        - code  # Flows and Scopes required if Flows is true -- code?
+        - code  # Flows and Scopes required - code is the minimum
       AllowedOAuthFlowsUserPoolClient: true
       AllowedOAuthScopes: 
         - openid
@@ -61,7 +57,7 @@ Resources:
       ClientName: !Sub '${CognitoBaseName}.client'
       ExplicitAuthFlows: 
         - ALLOW_REFRESH_TOKEN_AUTH
-      GenerateSecret: true
+      GenerateSecret: true  #required by ALB Listener
       IdTokenValidity: 1
       PreventUserExistenceErrors: ENABLED  # necessary for Oauth?
       ReadAttributes:
@@ -110,3 +106,19 @@ Resources:
         - updated_at
         - website
         - zoneinfo
+Outputs:
+  UserPoolArn:
+    Description: The ARN of the user pool
+    Value: !GetAtt CognitoUserPool.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolArn'
+  UserPoolClientId:
+    Description: The ClientId in the user pool
+    Value: !Ref CognitoUserPoolClient
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolClientId'
+  UserPoolDomain:
+    Description: The Domain in the user pool
+    Value: !Ref CognitoUserPoolDomain
+    Export:
+      Name: !Sub '${AWS::StackName}-CognitoUserPoolDomain'

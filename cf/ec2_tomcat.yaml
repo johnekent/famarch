@@ -254,7 +254,7 @@ Resources:
             SessionCookieName: AWSELBAuthSessionCookie  # default
             SessionTimeout: 43200  # 12 hours
             UserPoolArn: arn:aws:cognito-idp:us-east-1:653434772132:userpool/us-east-1_qitWt2Z12  #Note: all of this pool manually created
-            UserPoolClientId: 5q9fif2c6i82529p06og7gl18e
+            UserPoolClientId: scm6oclt0jf8sqrvc4ljm5cbv
             UserPoolDomain: ancestral-pictures
         - Type: forward
           Order: 2

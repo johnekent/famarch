@@ -61,6 +61,7 @@ Resources:
       ClientName: !Sub '${CognitoBaseName}.client'
       ExplicitAuthFlows: 
         - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: true
       IdTokenValidity: 1
       PreventUserExistenceErrors: ENABLED  # necessary for Oauth?
       ReadAttributes:

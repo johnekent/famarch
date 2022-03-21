@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: XTF Tomcat Cognito setup - separate one used for testing - not really expected to be run.
+Description: XTF Tomcat Cognito setup - this stack should be called xtf-cognito for Import from ec2_tomcat 
 Parameters:
   AppDomainBaseName:
       Type: String
@@ -17,7 +17,7 @@ Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      #AliasAttributes: - given_name - family_name - email   #TODO determine where to put these
+      #AliasAttributes: - given_name - family_name - email   #TODO determine if/where to put these
       EmailConfiguration:
         EmailSendingAccount: COGNITO_DEFAULT
       MfaConfiguration: 'OFF'

@@ -188,7 +188,7 @@ Resources:
             #!/bin/bash -xe
             yum update -y aws-cfn-bootstrap
             mkfs -t xfs /dev/nvme1n1; mkdir /xtf; mount /dev/nvme1n1 /xtf
-            aws s3 cp s3://us-east-1-brainflutter-xtf-fam/xtf/xtf.tar.gz /xtf/xtf.tar.gz
+            aws s3 cp s3://us-east-1-brainflutter-xtf-fam/xtf/v1_xtf.tar.gz /xtf/xtf.tar.gz
             cd /xtf; tar -xzvf xtf.tar.gz 
             gunzip -r /xtf/xtf
             gzip /xtf/xtf/index/pluralMap.txt

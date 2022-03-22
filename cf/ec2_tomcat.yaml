@@ -181,7 +181,7 @@ Resources:
             VirtualName: ephemeral0
           - DeviceName: /dev/sda2
             Ebs:
-              VolumeSize: 20            
+              VolumeSize: 30            
       UserData:
         Fn::Base64:
           !Sub |
